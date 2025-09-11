@@ -16,6 +16,7 @@ public class PlayerTest : MonoBehaviour
     private int currentLane;   // 0..2
     private float targetX;     // vị trí X mục tiêu theo làn
 
+    public static Transform PlayerTransform { get; private set; }
     private void Start()
     {
         currentLane = Mathf.Clamp(startingLane, 0, 2);
@@ -28,20 +29,25 @@ public class PlayerTest : MonoBehaviour
 
     private void Update()
     {
-        // Input đổi làn
-        if (Input.GetKeyDown(KeyCode.A)) ChangeLane(-1);
-        if (Input.GetKeyDown(KeyCode.D)) ChangeLane(+1);
-
-        // Chạy thẳng (nếu muốn)
-        if (forwardSpeed != 0f)
-            transform.Translate(Vector3.forward * forwardSpeed * Time.deltaTime, Space.World);
-
+        Turn();
+        MoveForward();
         // Lướt sang X mục tiêu
         Vector3 pos = transform.position;
         pos.x = Mathf.MoveTowards(pos.x, targetX, laneChangeSpeed * Time.deltaTime);
         transform.position = pos;
     }
-
+    private void MoveForward() 
+    {
+        // Chạy thẳng (nếu muốn)
+        if (forwardSpeed != 0f)
+            transform.Translate(Vector3.forward * forwardSpeed * Time.deltaTime, Space.World);
+    }
+    private void Turn() 
+    {
+        // Input đổi làn
+        if (Input.GetKeyDown(KeyCode.A)) ChangeLane(-1);
+        if (Input.GetKeyDown(KeyCode.D)) ChangeLane(+1);
+    }
     private void ChangeLane(int dir)
     {
         currentLane = Mathf.Clamp(currentLane + dir, 0, 2);
