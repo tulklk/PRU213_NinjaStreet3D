@@ -3,7 +3,7 @@
 public class Player : MonoBehaviour
 {
     [Header("Lane Settings")]
-    [SerializeField] private float laneOffset = 2.5f;   // Khoảng cách giữa tâm 2 làn
+    [SerializeField] private float laneOffset = 1f;   // Khoảng cách giữa tâm 2 làn
     [SerializeField] private int startingLane = 1;      // 0 = Trái, 1 = Giữa, 2 = Phải
 
     [Header("Movement")]
