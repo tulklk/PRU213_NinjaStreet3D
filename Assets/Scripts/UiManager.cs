@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using DG.Tweening;
 using UnityEngine.UI;
 
-public class UiManager : MonoBehaviour
+public class UIManager : MonoBehaviour
 {
-    public static UiManager instance;
+    public static UIManager instance;
     private Animator camPointAnimator;
     [SerializeField] private float hideBackgroundAtDistance = 5f;
     private bool isBackgroundHidden = false;
@@ -25,7 +26,7 @@ public class UiManager : MonoBehaviour
     //Text
     [Header("Text")]
     public TextMeshProUGUI coinText;
-    public TextMeshProUGUI distanceText;
+    public TextMeshProUGUI distanceText; 
     public TextMeshProUGUI coinTextLose;
     public TextMeshProUGUI powerUpCoinText;
     public TextMeshProUGUI powerUpGemText;
@@ -33,12 +34,12 @@ public class UiManager : MonoBehaviour
     public TextMeshProUGUI itemGemText;
 
     //public TextMeshProUGUI gemText; 
-    public TextMeshProUGUI totalCoinTextMenu;
+    public TextMeshProUGUI totalCoinTextMenu; 
     public TextMeshProUGUI totalGemTextMenu;
     public TextMeshProUGUI highestDistance;
     public TextMeshProUGUI maxDistanceText;
-
-
+    
+    
     //Các panel
     [Header("Panel")]
     public GameObject menuUI;
@@ -52,15 +53,15 @@ public class UiManager : MonoBehaviour
     public GameObject magnetUI;
     public GameObject shieldUI;
     public GameObject rocketUI;
-    public GameObject powerUpShopUI;
+    public GameObject powerUpShopUI; 
     public GameObject updateSuccessUI;
     public GameObject denyUpdateUI;
     public GameObject itemShopUI;
 
     [Header("Coin Fly Effect")]
-    public GameObject flyCoinPrefab;
+    public GameObject flyCoinPrefab;         
     public RectTransform uiCoinTarget;
-
+    
     [Header("Setting Sliders")]
     public Slider musicSlider;
     public Slider sfxSlider;
@@ -85,7 +86,7 @@ public class UiManager : MonoBehaviour
 
     void Update()
     {
-        CheckHideBackground();
+        CheckHideBackground(); 
     }
 
     private void CheckHideBackground()
@@ -158,22 +159,24 @@ public class UiManager : MonoBehaviour
             }
         }
         // Cập nhật giá trị ban đầu cho sliders từ AudioManager
-        //if (musicSlider != null)
-        //{
-        //    musicSlider.value = AudioManager.instance.musicVolume;
-        //    musicSlider.onValueChanged.AddListener(delegate { OnMusicVolumeChanged(musicSlider.value); });
-        //}
+        if (musicSlider != null)
+        {
+            musicSlider.value = AudioManager.instance.musicVolume;
+            musicSlider.onValueChanged.AddListener(delegate { OnMusicVolumeChanged(musicSlider.value); });
+        }
 
-        //if (sfxSlider != null)
-        //{
-        //    sfxSlider.value = AudioManager.instance.sfxVolume;
-        //    sfxSlider.onValueChanged.AddListener(delegate { OnSFXVolumeChanged(sfxSlider.value); });
-        //}
+        if (sfxSlider != null)
+        {
+            sfxSlider.value = AudioManager.instance.sfxVolume;
+            sfxSlider.onValueChanged.AddListener(delegate { OnSFXVolumeChanged(sfxSlider.value); });
+        }
 
     }
     public void StartGame()
     {
         Time.timeScale = 1f;
+        AudioManager.instance.StopMusic();
+        AudioManager.instance.PlayVehicleDepart();
         StartCoroutine(DelayPlayVehicleDriving());
 
         if (camPointAnimator != null)
@@ -197,8 +200,8 @@ public class UiManager : MonoBehaviour
     }
     IEnumerator DelayPlayVehicleDriving()
     {
-        yield return new WaitForSeconds(2.6f);
-        //AudioManager.instance.PlayVehicleDrivingLoop();
+        yield return new WaitForSeconds(2.6f); 
+        AudioManager.instance.PlayVehicleDrivingLoop();
     }
 
     public void VehicleShop()
@@ -216,7 +219,7 @@ public class UiManager : MonoBehaviour
         if (powerUpGemText != null)
             powerUpGemText.SetText(GameManager.instance.GetTotalGem().ToString());
 
-        UiAnimator.Show(powerUpShopUI);
+        UIAnimator.Show(powerUpShopUI);
     }
     // Mở item shop panel
     public void OpenItemShop()
@@ -226,7 +229,7 @@ public class UiManager : MonoBehaviour
 
         if (powerUpGemText != null)
             powerUpGemText.SetText(GameManager.instance.GetTotalGem().ToString());
-        UiAnimator.Show(itemShopUI);
+        UIAnimator.Show(itemShopUI);
     }
     // Đóng item shop panel
     public void CloseItemShop()
@@ -235,7 +238,7 @@ public class UiManager : MonoBehaviour
         PlayerPrefs.SetInt("TotalGems", GameManager.instance.GetTotalGem());
         PlayerPrefs.Save();
         RefreshMenuUI();
-        UiAnimator.Hide(itemShopUI);
+        UIAnimator.Hide(itemShopUI);
     }
 
 
@@ -245,7 +248,7 @@ public class UiManager : MonoBehaviour
         PlayerPrefs.SetInt("TotalGems", GameManager.instance.GetTotalGem());
         PlayerPrefs.Save();
         RefreshMenuUI();
-        UiAnimator.Hide(powerUpShopUI);
+        UIAnimator.Hide(powerUpShopUI);
     }
     public void RefreshMenuUI()
     {
@@ -264,7 +267,7 @@ public class UiManager : MonoBehaviour
     public void ReturnHome()
     {
         SceneManager.LoadScene("Play");
-
+        
     }
 
     public void Quit()
@@ -282,7 +285,7 @@ public class UiManager : MonoBehaviour
 
         GameManager.instance.RetryGame();
 
-
+       
         if (totalCoinTextMenu != null)
         {
             totalCoinTextMenu.SetText(GameManager.instance.GetTotalCoins().ToString());
@@ -291,20 +294,20 @@ public class UiManager : MonoBehaviour
     }
     public void PausedGame()
     {
-        UiAnimator.Show(pauseUI);
+        UIAnimator.Show(pauseUI);
         GameManager.instance.PauseGame();
 
     }
     public void ResumeGame()
     {
-        UiAnimator.Hide(pauseUI);
-        playerSceneUI.SetActive(true);
-        GameManager.instance.ResumeGame();
+            UIAnimator.Hide(pauseUI);
+            playerSceneUI.SetActive(true);
+            GameManager.instance.ResumeGame();
 
     }
     public void RestartGame()
     {
-
+        
         if (backgroundObject != null)
         {
             backgroundObject.SetActive(true);
@@ -313,21 +316,21 @@ public class UiManager : MonoBehaviour
 
         GameManager.instance.RetryGame();
     }
-
+    
     public void ShowGameOverUI(int coins, float distance, float maxDistance)
     {
         gameOverUI.SetActive(true);
         playerSceneUI.SetActive(false);
 
-
+        
         if (coinTextLose != null)
             coinTextLose.SetText($"{coins}");
 
-
+        
         if (distanceText != null)
             distanceText.SetText($"{distance:F1} M");
 
-
+        
         if (maxDistanceText != null)
         {
             if (distance > maxDistance)
@@ -336,7 +339,7 @@ public class UiManager : MonoBehaviour
                 maxDistanceText.SetText($"{maxDistance:F1} M");
         }
 
-
+        
         if (totalCoinTextMenu != null)
             totalCoinTextMenu.SetText(GameManager.instance.GetTotalCoins().ToString());
     }
@@ -349,33 +352,33 @@ public class UiManager : MonoBehaviour
     //Setting Panel
     public void SettingButton()
     {
-
-        UiAnimator.Show(settingUI);
+       
+        UIAnimator.Show(settingUI);
 
     }
 
     //Deny Buy UI
     public void ShowDenyBuyUI()
     {
-        UiAnimator.Show(denyUpdateUI);
+        UIAnimator.Show(denyUpdateUI);
     }
     public void CloseDenyBuyUI()
     {
-        UiAnimator.Hide(denyUpdateUI);
+        UIAnimator.Hide(denyUpdateUI);
     }
     //Deny Update UI
     public void ShowDenyUpdateUI()
     {
-        UiAnimator.Show(denyUpdateUI);
+        UIAnimator.Show(denyUpdateUI);
     }
     public void CloseDenyUpdateUI()
     {
-        UiAnimator.Hide(denyUpdateUI);
+        UIAnimator.Hide(denyUpdateUI);
     }
     public void CloseSetting()
     {
-
-        UiAnimator.Hide(settingUI);
+        
+        UIAnimator.Hide(settingUI);
     }
     //Boost UI
     public void TurnBoostUi()
@@ -387,47 +390,47 @@ public class UiManager : MonoBehaviour
         boostUI.SetActive(false);
     }
     //Magnet UI
-    //public void TurnMagnetUi()
-    //{
-    //    magnetUI.SetActive(true);
+    public void TurnMagnetUi()
+    {
+        magnetUI.SetActive(true);
 
-    //    if (magnetUI != null)
-    //    {
-    //        var slider = magnetUI.GetComponent<ItemEffectSlider>();
-    //        if (slider != null)
-    //        {
-    //            float duration = PowerUpDatabase.GetValue("magnet");
-    //            slider.StartCountdown(magnetIcon, duration);
-    //        }
-    //    }
-    //}
+        if (magnetUI != null)
+        {
+            var slider = magnetUI.GetComponent<ItemEffectSlider>();
+            if (slider != null)
+            {
+                float duration = PowerUpDatabase.GetValue("magnet"); 
+                slider.StartCountdown(magnetIcon, duration);
+            }
+        }
+    }
 
     //Mở power up shop panel
 
-    //public void PlayCoinBurstEffect(Vector3 worldStartPos, int coinAmount = 5)
-    //{
-    //    for (int i = 0; i < coinAmount; i++)
-    //    {
-    //        StartCoroutine(SpawnFlyCoinWithDelay(worldStartPos, i * 0.05f));
-    //    }
-    //}
+    public void PlayCoinBurstEffect(Vector3 worldStartPos, int coinAmount = 5)
+    {
+        for (int i = 0; i < coinAmount; i++)
+        {
+            StartCoroutine(SpawnFlyCoinWithDelay(worldStartPos, i * 0.05f)); 
+        }
+    }
     //Effect
 
     //Hiệu ứng coin bay
-    //IEnumerator SpawnFlyCoinWithDelay(Vector3 worldStartPos, float delay)
-    //{
-    //    yield return new WaitForSeconds(delay);
+    IEnumerator SpawnFlyCoinWithDelay(Vector3 worldStartPos, float delay)
+    {
+        yield return new WaitForSeconds(delay);
 
-    //    Vector3 screenPos = Camera.main.WorldToScreenPoint(worldStartPos);
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(worldStartPos);
 
-    //    GameObject coin = Instantiate(flyCoinPrefab, transform);
-    //    RectTransform rect = coin.GetComponent<RectTransform>();
-    //    rect.position = screenPos + new Vector3(Random.Range(-30f, 30f), Random.Range(-30f, 30f), 0f);
+        GameObject coin = Instantiate(flyCoinPrefab, transform);
+        RectTransform rect = coin.GetComponent<RectTransform>();
+        rect.position = screenPos + new Vector3(Random.Range(-30f, 30f), Random.Range(-30f, 30f), 0f); 
 
-    //    CoinFlyEffect fly = coin.GetComponent<CoinFlyEffect>();
-    //    fly.targetUI = uiCoinTarget.GetComponent<RectTransform>();
-    //}
-
+        CoinFlyEffect fly = coin.GetComponent<CoinFlyEffect>();
+        fly.targetUI = uiCoinTarget.GetComponent<RectTransform>();
+    }
+    
     IEnumerator FadeInToMenu(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -468,13 +471,14 @@ public class UiManager : MonoBehaviour
         toGroup.blocksRaycasts = true;
     }
 
-    //public void OnMusicVolumeChanged(float value)
-    //{
-    //    AudioManager.instance.SetMusicVolume(value);
-    //}
+    public void OnMusicVolumeChanged(float value)
+    {
+        AudioManager.instance.SetMusicVolume(value);
+    }
 
-    //public void OnSFXVolumeChanged(float value)
-    //{
-    //    AudioManager.instance.SetSFXVolume(value);
-    //}
+    public void OnSFXVolumeChanged(float value)
+    {
+        AudioManager.instance.SetSFXVolume(value);
+    }
+    
 }

@@ -1,6 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class VehicleSelected : MonoBehaviour
 {
@@ -8,11 +6,11 @@ public class VehicleSelected : MonoBehaviour
     public GameObject[] vehicles;
     void Start()
     {
-        currentVehicleIndex = PlayerPrefs.GetInt("SelectedVehicle", 0);
+        currentVehicleIndex = PlayerPrefs.GetInt("SelectedVehicle", 0); 
         foreach (GameObject vehicle in vehicles)
         {
-            vehicle.SetActive(false);
+            vehicle.SetActive(false); 
         }
-        vehicles[currentVehicleIndex].SetActive(true);
+        vehicles[currentVehicleIndex].SetActive(true); 
     }
 }

@@ -3,12 +3,27 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Ground
+  - Bus
+  - RacingBoy
+  - Toyota
+  - Wheels
+  - Coin
+  - GroundTile
+  - GroundTile1
+  - Slope
+  - PlayerBubble
+  - CoinDetector
+  - Obstacle
+  - Rocket
+  - Shield
+  - Vehicle
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Vehicle
   - Water
   - UI
   - 
