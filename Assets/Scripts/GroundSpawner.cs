@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ public class GroundSpawner : MonoBehaviour
     private List<int> group1AvailableIndices = new List<int>();
     private List<int> group1UsedInFirst4 = new List<int>();
     private List<int> group2AvailableIndices = new List<int>();
-
+    
 
     private void Awake()
     {
@@ -49,7 +50,7 @@ public class GroundSpawner : MonoBehaviour
         }
     }
 
-
+    
     public void SpawnTile()
     {
         int tileIndex = -1;
@@ -67,7 +68,7 @@ public class GroundSpawner : MonoBehaviour
         {
             if (group2AvailableIndices.Count == 0)
             {
-
+                
                 for (int i = 0; i < group2Tiles.Length; i++)
                     group2AvailableIndices.Add(i);
             }
@@ -156,4 +157,9 @@ public class GroundSpawner : MonoBehaviour
         pool.Enqueue(reused);
         return reused;
     }
+
 }
+
+
+
+
