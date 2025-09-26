@@ -1,11 +1,10 @@
 ﻿using DG.Tweening;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public static class UiAnimator 
+public static class UIAnimator
 {
+    //Phải thêm SetUpdate(true) để hoạt ảnh hoạt động trong chế độ không đồng bộ (Unscaled Time) (không ảnh hưởng đến Time.timeScale)
     public static void Show(GameObject ui, float duration = 0.3f)
     {
         ui.SetActive(true);
@@ -16,7 +15,7 @@ public static class UiAnimator
         group.transform.localScale = Vector3.one * 0.5f;
 
         group.DOFade(1f, duration).SetUpdate(true);
-        group.transform.DOScale(1f, duration).SetEase(Ease.OutBack).SetUpdate(true);
+        group.transform.DOScale(1f, duration).SetEase(Ease.OutBack).SetUpdate(true); 
     }
 
     public static void Hide(GameObject ui, float duration = 0.2f)
@@ -30,6 +29,41 @@ public static class UiAnimator
             ui.SetActive(false);
         });
     }
+
+    // ✅ Hiển thị các button với hiệu ứng lần lượt
+    //public static void AnimateButtonsIn(float baseDelay, params Button[] buttons)
+    //{
+    //    float delayStep = 0.1f;
+    //    for (int i = 0; i < buttons.Length; i++)
+    //    {
+    //        Button btn = buttons[i];
+    //        RectTransform rect = btn.GetComponent<RectTransform>();
+    //        CanvasGroup group = btn.GetComponent<CanvasGroup>();
+    //        if (group == null) group = btn.gameObject.AddComponent<CanvasGroup>();
+
+    //        group.alpha = 0f;
+    //        rect.localScale = Vector3.zero;
+
+    //        float delay = baseDelay + i * delayStep;
+
+    //        group.DOFade(1f, 0.3f).SetDelay(delay).SetUpdate(true);
+    //        rect.DOScale(1f, 0.4f).SetDelay(delay).SetEase(Ease.OutBack).SetUpdate(true);
+    //    }
+    //}
+
+    //// ✅ Ẩn các button
+    //public static void AnimateButtonsOut(float delay, params Button[] buttons)
+    //{
+    //    foreach (Button btn in buttons)
+    //    {
+    //        RectTransform rect = btn.GetComponent<RectTransform>();
+    //        CanvasGroup group = btn.GetComponent<CanvasGroup>();
+    //        if (group == null) continue;
+
+    //        group.DOFade(0f, 0.2f).SetDelay(delay).SetUpdate(true);
+    //        rect.DOScale(0.5f, 0.2f).SetEase(Ease.InBack).SetUpdate(true);
+    //    }
+    //}
 
     public static void AnimateButtonsIn(float baseDelay, params Button[] buttons)
     {
@@ -78,4 +112,6 @@ public static class UiAnimator
                 .SetUpdate(true);
         }
     }
+
 }
+

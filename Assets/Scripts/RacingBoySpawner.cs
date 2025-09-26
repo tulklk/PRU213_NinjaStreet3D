@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RacingBoySpawner : MonoBehaviour
@@ -59,13 +58,13 @@ public class RacingBoySpawner : MonoBehaviour
 
     public void ScheduleSpawn(Transform groundTile)
     {
-        if (PlayerController.Instance == null)
+        if (PlayerControllerSmooth.Instance == null)
         {
             Debug.LogWarning("Không tìm thấy PlayerControllerSmooth.Instance!");
             return;
         }
 
-        playerTransform = PlayerController.Instance.transform;
+        playerTransform = PlayerControllerSmooth.Instance.transform;
         StartCoroutine(SpawnRoutine(groundTile));
     }
 
@@ -80,7 +79,7 @@ public class RacingBoySpawner : MonoBehaviour
 
         yield return new WaitForSeconds(redLineDuration);
 
-
+        
         SpawnWheels();
     }
 
@@ -125,7 +124,7 @@ public class RacingBoySpawner : MonoBehaviour
         Vector3 targetPos = redLinePos + Vector3.forward * 10f;
         Vector3 direction = (targetPos - spawnPos).normalized;
 
-        float groundOffset = 0.5f;
+        float groundOffset = 0.5f; 
         Vector3 adjustedSpawnPos = spawnPos + Vector3.up * groundOffset;
 
         GameObject rb = ObjectPooler.Instance.SpawnFromPool("Wheels", adjustedSpawnPos);
@@ -135,4 +134,8 @@ public class RacingBoySpawner : MonoBehaviour
             controller.LaunchTowards(direction);
         }
     }
+
+
+
+
 }

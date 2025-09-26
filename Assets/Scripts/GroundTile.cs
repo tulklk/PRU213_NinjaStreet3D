@@ -105,8 +105,8 @@ public class GroundTile : MonoBehaviour
 
     [Header("Coin")]
     //Coin
-    public GameObject coinPrefab;
-    public Transform[] coinSpawnPoints;
+    public GameObject coinPrefab; 
+    public Transform[] coinSpawnPoints; 
     public int numberOfCoins = 5;
     public float coinSpacingZ = 3f;
     //private int coinLaneIndex = -1;
@@ -119,7 +119,7 @@ public class GroundTile : MonoBehaviour
 
 
     private void OnEnable()
-    {
+    { 
         //Coins
         SpawnCoins();
         //Motor
@@ -158,7 +158,7 @@ public class GroundTile : MonoBehaviour
 
         //Mystery Box
         SpawnMysteryBox();
-
+        
 
     }
 
@@ -173,7 +173,7 @@ public class GroundTile : MonoBehaviour
     }
     //Hàm xóa tile khi tile ra khỏi player một khoảng
 
-
+   
 
     private IEnumerator DisableTileWhenInvisible()
     {
@@ -242,7 +242,7 @@ public class GroundTile : MonoBehaviour
             Instantiate(xanhForwardPrefabs, spawnPoint.position, Quaternion.identity, transform);
         }
     }
-
+    
     void SpawnXanhBackWard()
     {
         if (xanhBackwardPrefabs == null || spawnPointsXanhsBackward.Length == 0) return;
@@ -344,7 +344,7 @@ public class GroundTile : MonoBehaviour
             Instantiate(blueBusForwardPrefabs, spawnPoint.position, Quaternion.identity, transform);
         }
     }
-
+   
     void SpawnBlueBusBackward()
     {
         if (blueBusBackwardPrefabs == null || spawnPointsBlueBusBackward.Length == 0) return;
@@ -437,7 +437,7 @@ public class GroundTile : MonoBehaviour
             Instantiate(waveForwardPrefabs, spawnPoint.position, Quaternion.identity, transform);
         }
     }
-
+    
 
     void SpawnWaveBackward()
     {
@@ -461,7 +461,7 @@ public class GroundTile : MonoBehaviour
     public void ResetTile()
     {
         // 🔁 Xoá toàn bộ con được spawn trước đó
-
+        
         foreach (Transform child in transform)
         {
             if (child != transform &&
@@ -481,11 +481,11 @@ public class GroundTile : MonoBehaviour
                 !child.name.Contains("NitroBoost") &&
                 !child.name.Contains("Magnet") &&
                 !child.name.Contains("Rocket") &&
-                !child.name.Contains("Shield")
+                !child.name.Contains("Shield") 
 
 
-                )
-
+                ) 
+                
             {
                 Destroy(child.gameObject);
             }
