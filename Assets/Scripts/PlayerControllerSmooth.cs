@@ -1,5 +1,10 @@
-﻿using System.Collections;
+﻿
+using System.Collections;
 using UnityEngine;
+
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem; 
+#endif
 
 public class PlayerControllerSmooth : MonoBehaviour
 {
@@ -12,12 +17,7 @@ public class PlayerControllerSmooth : MonoBehaviour
 
     [Header("Speed Control")]
     [SerializeField] private float speed = 7f;
-    //[SerializeField] private float rotationSmoothness = 5f;
-    public float Speed
-    {
-        get => speed;
-        set => speed = value;
-    }
+    public float Speed { get => speed; set => speed = value; }
     public bool isBoosting = false;
 
     private float horizontalInput;
@@ -28,7 +28,11 @@ public class PlayerControllerSmooth : MonoBehaviour
     private float maxTurnAngle = 30f;
     private float turnSpeed = 5f;
 
-    //private bool isSpeedBoosted = false;
+    // === GAMEPAD settings ===
+    [Header("Gamepad")]
+    [SerializeField] private float gamepadSensitivity = 1.0f;   // scale độ nhạy ngang
+    [SerializeField] private float gamepadDeadzone = 0.15f;     // deadzone cho analog
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -36,7 +40,6 @@ public class PlayerControllerSmooth : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
         Instance = this;
         PlayerTransform = transform;
     }
@@ -44,15 +47,8 @@ public class PlayerControllerSmooth : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezeRotationX |
-                     RigidbodyConstraints.FreezeRotationZ;
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         screenWidth = Screen.width;
-
-        //if (coinDetector != null)
-        //    coinDetector.SetActive(false);
-
-        //if (shieldEffect != null)
-        //    shieldEffect.SetActive(false);
     }
 
     void Update()
@@ -60,93 +56,93 @@ public class PlayerControllerSmooth : MonoBehaviour
         if (!isGameStarted) return;
 
         HandleInput();
-        //HandleTiltRotation();
 
         if (transform.position.y < -5)
-        {
             Die();
-        }
     }
+
     private void HandleInput()
     {
         horizontalInput = 0f;
 
-        foreach (Touch touch in Input.touches)
+        // --- Touch (legacy) ---
+        foreach (UnityEngine.Touch touch in UnityEngine.Input.touches)
         {
-            // ❗ Nếu chạm vào UI thì bỏ qua
-            if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Stationary)
+            if (touch.phase == UnityEngine.TouchPhase.Began ||
+                touch.phase == UnityEngine.TouchPhase.Stationary)
             {
-                if (IsTouchOverUI(touch.fingerId))
-                    continue;
-
-                if (touch.position.x < screenWidth / 2)
-                    horizontalInput = -1f;
-                else
-                    horizontalInput = 1f;
+                if (IsTouchOverUI(touch.fingerId)) continue;
+                horizontalInput = (touch.position.x < screenWidth / 2) ? -1f : 1f;
             }
         }
 
-        float tilt = Input.acceleration.x * tiltSensitivity;
+        // --- Tilt ---
+        float tilt = UnityEngine.Input.acceleration.x * tiltSensitivity;
         horizontalInput += Mathf.Clamp(tilt, -1f, 1f);
+
+        // --- Gamepad (Input System) ---
+#if ENABLE_INPUT_SYSTEM
+        if (Gamepad.current != null)
+        {
+            float stickX = Gamepad.current.leftStick.ReadValue().x;
+            if (Mathf.Abs(stickX) < gamepadDeadzone) stickX = 0f;
+            float dpadX = Gamepad.current.dpad.ReadValue().x;
+            float padX = Mathf.Clamp((stickX + dpadX) * gamepadSensitivity, -1f, 1f);
+            horizontalInput += padX;
+        }
+#endif
     }
+
+
     private bool IsTouchOverUI(int fingerId)
     {
-        return UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(fingerId);
+        return UnityEngine.EventSystems.EventSystem.current != null &&
+               UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(fingerId);
     }
+
     private void HandleTiltRotation()
     {
-        float tiltAngle = maxTurnAngle * horizontalInput;
+        float tiltAngle = maxTurnAngle * Mathf.Clamp(horizontalInput, -1f, 1f);
         Quaternion targetRotation = Quaternion.Euler(0f, tiltAngle, 0f);
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * turnSpeed);
     }
-    
+
     void FixedUpdate()
     {
         if (!isAlive || !isGameStarted) return;
 
+        // Di chuyển thẳng + ngang (liên tục – hợp với analog)
         Vector3 moveDirection = transform.forward * speed * Time.fixedDeltaTime;
         moveDirection += transform.right * horizontalInput * speed * Time.fixedDeltaTime;
 
         Vector3 newPosition = transform.position + moveDirection;
 
-        // ✅ Giới hạn vùng di chuyển (ví dụ từ -3 đến +3 theo trục X)
+        // Giới hạn biên X
         newPosition.x = Mathf.Clamp(newPosition.x, -9.5f, 9.5f);
 
         transform.position = newPosition;
 
         HandleTiltRotation();
     }
+
     public void Die()
     {
         isAlive = false;
         GameManager.instance.GameOver();
     }
 
-    public void SetGameStarted(bool state)
-    {
-        isGameStarted = state;
-    }
+    public void SetGameStarted(bool state) => isGameStarted = state;
+
     public void UpdateSpeedByDistance(float distance)
     {
-        if (isBoosting) return; 
+        if (isBoosting) return;
 
         float newSpeed = 5f + Mathf.Floor(distance / 100f);
         newSpeed = Mathf.Min(newSpeed, 20f);
 
         if (Mathf.Abs(speed - newSpeed) > 0.01f)
-        {
             speed = newSpeed;
-        }
     }
 
-    public Rigidbody GetRigidbody()
-    {
-        return rb;
-    }
-    
-    //private void OnTriggerEnter(Collider other)
-    //{
-        
-    //}
-
+    public Rigidbody GetRigidbody() => rb;
 }
