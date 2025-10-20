@@ -1,10 +1,7 @@
 ﻿
 using System.Collections;
 using UnityEngine;
-
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem; 
-#endif
+using UnityEngine.InputSystem;
 
 public class PlayerControllerSmooth : MonoBehaviour
 {
@@ -28,6 +25,20 @@ public class PlayerControllerSmooth : MonoBehaviour
     private float maxTurnAngle = 30f;
     private float turnSpeed = 5f;
 
+    [Header("Wheelie (Bốc đầu)")]
+    [SerializeField] private bool canWheelie = true;
+    [SerializeField] private float wheelieForce = 10f;
+    [SerializeField] private float wheelieDuration = 2f;
+    [SerializeField] private float wheelieCooldown = 3f;
+    [SerializeField] private float wheelieAngle = 45f; // Góc bốc đầu (độ)
+    [SerializeField] private float wheelieSpeed = 5f; // Tốc độ animation bốc đầu
+    [SerializeField] private Transform motorcycleModel; // Mô hình xe máy để xoay
+    private bool isWheelieing = false;
+    private float wheelieTimer = 0f;
+    private float wheelieCooldownTimer = 0f;
+    private Quaternion originalRotation;
+    private Quaternion wheelieRotation;
+
     // === GAMEPAD settings ===
     [Header("Gamepad")]
     [SerializeField] private float gamepadSensitivity = 1.0f;   // scale độ nhạy ngang
@@ -49,6 +60,30 @@ public class PlayerControllerSmooth : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         screenWidth = Screen.width;
+        
+        // Tự động tìm mô hình xe máy nếu chưa gán
+        if (motorcycleModel == null)
+        {
+            // Tìm đối tượng con có MeshRenderer (mô hình xe)
+            MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>();
+            if (renderers.Length > 0)
+            {
+                motorcycleModel = renderers[0].transform;
+                Debug.Log($"🎮 Tìm thấy mô hình xe: {motorcycleModel.name}");
+            }
+        }
+        
+        // Lưu rotation gốc cho animation bốc đầu
+        if (motorcycleModel != null)
+        {
+            originalRotation = motorcycleModel.rotation;
+            wheelieRotation = Quaternion.Euler(wheelieAngle, 0f, 0f);
+        }
+        else
+        {
+            originalRotation = transform.rotation;
+            wheelieRotation = Quaternion.Euler(wheelieAngle, 0f, 0f);
+        }
     }
 
     void Update()
@@ -56,6 +91,7 @@ public class PlayerControllerSmooth : MonoBehaviour
         if (!isGameStarted) return;
 
         HandleInput();
+        UpdateWheelie();
 
         if (transform.position.y < -5)
             Die();
@@ -91,6 +127,9 @@ public class PlayerControllerSmooth : MonoBehaviour
             horizontalInput += padX;
         }
 #endif
+
+        // --- Wheelie Input ---
+        HandleWheelieInput();
     }
 
 
@@ -145,4 +184,129 @@ public class PlayerControllerSmooth : MonoBehaviour
     }
 
     public Rigidbody GetRigidbody() => rb;
+
+    // =========================
+    // WHEELIE (BỐC ĐẦU) FUNCTIONS
+    // =========================
+    
+    private void HandleWheelieInput()
+    {
+        // Bốc đầu bằng phím Space (backup)
+        if (UnityEngine.Input.GetKeyDown(KeyCode.Space))
+        {
+            if (canWheelie && wheelieCooldownTimer <= 0f)
+            {
+                StartWheelie();
+            }
+        }
+        
+        // Gamepad input - nút A (buttonSouth)
+        if (Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame)
+        {
+            if (canWheelie && wheelieCooldownTimer <= 0f)
+            {
+                StartWheelie();
+            }
+        }
+        
+        // Touch input - chạm đúp để bốc đầu
+        foreach (UnityEngine.Touch touch in UnityEngine.Input.touches)
+        {
+            if (touch.tapCount >= 2 && touch.phase == UnityEngine.TouchPhase.Began)
+            {
+                if (canWheelie && wheelieCooldownTimer <= 0f)
+                {
+                    StartWheelie();
+                }
+                break;
+            }
+        }
+    }
+    
+    // Input System callback cho Wheelie action
+    public void OnWheelie(InputAction.CallbackContext context)
+    {
+        Debug.Log($"🎮 OnWheelie called: {context.phase}, canWheelie: {canWheelie}, cooldown: {wheelieCooldownTimer}");
+        
+        if (context.performed && canWheelie && wheelieCooldownTimer <= 0f)
+        {
+            StartWheelie();
+        }
+    }
+    
+    private void StartWheelie()
+    {
+        if (isWheelieing) return;
+        
+        isWheelieing = true;
+        wheelieTimer = wheelieDuration;
+        wheelieCooldownTimer = wheelieCooldown;
+        
+        // Áp dụng lực bốc đầu
+        rb.AddTorque(transform.right * wheelieForce, ForceMode.Impulse);
+        
+        // Hiển thị UI bốc đầu
+        if (UIManager.instance != null)
+        {
+            UIManager.instance.TurnWheelieUI();
+        }
+        
+        Debug.Log("🔥 BỐC ĐẦU!");
+    }
+    
+    private void UpdateWheelie()
+    {
+        // Cập nhật timer bốc đầu
+        if (isWheelieing)
+        {
+            wheelieTimer -= Time.deltaTime;
+            
+            // Animation bốc đầu - xoay mô hình xe lên
+            if (motorcycleModel != null)
+            {
+                Quaternion targetRotation = wheelieRotation;
+                motorcycleModel.rotation = Quaternion.Lerp(motorcycleModel.rotation, targetRotation, Time.deltaTime * wheelieSpeed);
+            }
+            
+            if (wheelieTimer <= 0f)
+            {
+                EndWheelie();
+            }
+        }
+        else
+        {
+            // Animation hạ bánh - xoay mô hình xe về vị trí bình thường
+            if (motorcycleModel != null)
+            {
+                if (motorcycleModel.rotation != originalRotation)
+                {
+                    motorcycleModel.rotation = Quaternion.Lerp(motorcycleModel.rotation, originalRotation, Time.deltaTime * wheelieSpeed);
+                }
+            }
+        }
+        
+        // Cập nhật cooldown
+        if (wheelieCooldownTimer > 0f)
+        {
+            wheelieCooldownTimer -= Time.deltaTime;
+        }
+    }
+    
+    private void EndWheelie()
+    {
+        isWheelieing = false;
+        
+        // Tắt UI bốc đầu
+        if (UIManager.instance != null)
+        {
+            UIManager.instance.StopWheelieUI();
+        }
+        
+        Debug.Log("💥 Hạ bánh trước!");
+    }
+    
+    // Public methods để UI có thể hiển thị trạng thái
+    public bool IsWheelieing() => isWheelieing;
+    public float GetWheelieCooldown() => wheelieCooldownTimer;
+    public bool CanWheelie() => canWheelie && wheelieCooldownTimer <= 0f;
 }
