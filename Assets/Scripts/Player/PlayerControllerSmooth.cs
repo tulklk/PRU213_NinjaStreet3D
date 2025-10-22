@@ -1,160 +1,9 @@
 ﻿
-//using System.Collections;
-//using UnityEngine;
-
-//#if ENABLE_INPUT_SYSTEM
-//using UnityEngine.InputSystem; 
-//#endif
-
-//public class PlayerControllerSmooth : MonoBehaviour
-//{
-//    public static PlayerControllerSmooth Instance { get; private set; }
-//    public static Transform PlayerTransform { get; private set; }
-
-//    private bool isAlive = true;
-//    private bool isGameStarted = false;
-//    private Rigidbody rb;
-
-//    [Header("Speed Control")]
-//    [SerializeField] private float speed = 7f;
-//    public float Speed { get => speed; set => speed = value; }
-//    public bool isBoosting = false;
-
-//    private float horizontalInput;
-//    private float screenWidth;
-//    private float tiltSensitivity = 3.0f;
-
-//    [Header("Turning")]
-//    private float maxTurnAngle = 30f;
-//    private float turnSpeed = 5f;
-
-//    // === GAMEPAD settings ===
-//    [Header("Gamepad")]
-//    [SerializeField] private float gamepadSensitivity = 1.0f;   // scale độ nhạy ngang
-//    [SerializeField] private float gamepadDeadzone = 0.15f;     // deadzone cho analog
-
-//    void Awake()
-//    {
-//        if (Instance != null && Instance != this)
-//        {
-//            Destroy(gameObject);
-//            return;
-//        }
-//        Instance = this;
-//        PlayerTransform = transform;
-//    }
-
-//    void Start()
-//    {
-//        rb = GetComponent<Rigidbody>();
-//        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-//        screenWidth = Screen.width;
-//    }
-
-//    void Update()
-//    {
-//        if (!isGameStarted) return;
-
-//        HandleInput();
-
-//        if (transform.position.y < -5)
-//            Die();
-//    }
-
-//    private void HandleInput()
-//    {
-//        horizontalInput = 0f;
-
-//        // --- Touch (legacy) ---
-//        foreach (UnityEngine.Touch touch in UnityEngine.Input.touches)
-//        {
-//            if (touch.phase == UnityEngine.TouchPhase.Began ||
-//                touch.phase == UnityEngine.TouchPhase.Stationary)
-//            {
-//                if (IsTouchOverUI(touch.fingerId)) continue;
-//                horizontalInput = (touch.position.x < screenWidth / 2) ? -1f : 1f;
-//            }
-//        }
-
-//        // --- Tilt ---
-//        float tilt = UnityEngine.Input.acceleration.x * tiltSensitivity;
-//        horizontalInput += Mathf.Clamp(tilt, -1f, 1f);
-
-//        // --- Gamepad (Input System) ---
-//#if ENABLE_INPUT_SYSTEM
-//        if (Gamepad.current != null)
-//        {
-//            float stickX = Gamepad.current.leftStick.ReadValue().x;
-//            if (Mathf.Abs(stickX) < gamepadDeadzone) stickX = 0f;
-//            float dpadX = Gamepad.current.dpad.ReadValue().x;
-//            float padX = Mathf.Clamp((stickX + dpadX) * gamepadSensitivity, -1f, 1f);
-//            horizontalInput += padX;
-//        }
-//#endif
-//    }
-
-
-//    private bool IsTouchOverUI(int fingerId)
-//    {
-//        return UnityEngine.EventSystems.EventSystem.current != null &&
-//               UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(fingerId);
-//    }
-
-//    private void HandleTiltRotation()
-//    {
-//        float tiltAngle = maxTurnAngle * Mathf.Clamp(horizontalInput, -1f, 1f);
-//        Quaternion targetRotation = Quaternion.Euler(0f, tiltAngle, 0f);
-//        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * turnSpeed);
-//    }
-
-//    void FixedUpdate()
-//    {
-//        if (!isAlive || !isGameStarted) return;
-
-//        // Di chuyển thẳng + ngang (liên tục – hợp với analog)
-//        Vector3 moveDirection = transform.forward * speed * Time.fixedDeltaTime;
-//        moveDirection += transform.right * horizontalInput * speed * Time.fixedDeltaTime;
-
-//        Vector3 newPosition = transform.position + moveDirection;
-
-//        // Giới hạn biên X
-//        newPosition.x = Mathf.Clamp(newPosition.x, -9.5f, 9.5f);
-
-//        transform.position = newPosition;
-
-//        HandleTiltRotation();
-//    }
-
-//    public void Die()
-//    {
-//        isAlive = false;
-//        GameManager.instance.GameOver();
-//    }
-
-//    public void SetGameStarted(bool state) => isGameStarted = state;
-
-//    public void UpdateSpeedByDistance(float distance)
-//    {
-//        if (isBoosting) return;
-
-//        float newSpeed = 5f + Mathf.Floor(distance / 100f);
-//        newSpeed = Mathf.Min(newSpeed, 20f);
-
-//        if (Mathf.Abs(speed - newSpeed) > 0.01f)
-//            speed = newSpeed;
-//    }
-
-//    public Rigidbody GetRigidbody() => rb;
-//}
-
-
 using System.Collections;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
-
-// === Alias để tránh trùng Input System ===
 using LegacyInput = UnityEngine.Input;
 using LegacyTouch = UnityEngine.Touch;
 using LegacyTouchPhase = UnityEngine.TouchPhase;
@@ -182,11 +31,19 @@ public class PlayerControllerSmooth : MonoBehaviour
     private float turnSpeed = 5f;
 
     [Header("Wheelie Settings")]
-    [SerializeField] private float wheelieAngle = 25f;      // góc bốc đầu
-    [SerializeField] private float wheelieDuration = 2f;    // thời gian giữ bốc đầu
-    [SerializeField] private float wheelieSpeed = 3f;       // tốc độ xoay
+    [SerializeField] private float wheelieAngle = 25f;
+    [SerializeField] private float wheelieDuration = 2f;
+    [SerializeField] private float wheelieSpeed = 3f;
     private bool isWheelie = false;
 
+    // ===== Nitro Settings =====
+    [Header("Nitro Charge")]
+    [SerializeField] private float nitroMax = 100f;          // đầy bình
+    [SerializeField] private float nitroPerSwerve = 5f;     // mỗi lần quạo (trái↔phải nhanh)
+    [SerializeField] private float nitroDecayPerSec = 3f;    // tự tụt dần
+    [SerializeField] private float swerveWindow = 0.35f;     // thời gian đổi cạnh hợp lệ
+    [SerializeField] private float edgePercent = 0.2f;       // vùng rìa màn hình để tính “quạo”
+    private float nitro = 0f;
     private Vector2 swipeStartPos;
     private bool isSwiping = false;
 
@@ -216,11 +73,10 @@ public class PlayerControllerSmooth : MonoBehaviour
     void Update()
     {
         if (!isGameStarted) return;
+
         HandleInput();
-
-        // Kiểm tra vuốt màn hình
         HandleSwipe();
-
+        HandleNitroDecayAndTrigger();
         if (transform.position.y < -5)
             Die();
     }
@@ -229,22 +85,29 @@ public class PlayerControllerSmooth : MonoBehaviour
     {
         horizontalInput = 0f;
 
-        // --- Legacy Touch ---
+        
         foreach (LegacyTouch touch in LegacyInput.touches)
         {
-            if (touch.phase == LegacyTouchPhase.Began ||
-                touch.phase == LegacyTouchPhase.Stationary)
+            if (IsTouchOverUI(touch.fingerId)) continue;
+
+            // lái trái/phải như trước
+            if (touch.phase == LegacyTouchPhase.Began || touch.phase == LegacyTouchPhase.Stationary || touch.phase == LegacyTouchPhase.Moved)
             {
-                if (IsTouchOverUI(touch.fingerId)) continue;
                 horizontalInput = (touch.position.x < screenWidth / 2) ? -1f : 1f;
+                
+            }
+
+            // phát hiện chạm vùng rìa để cộng Nitro
+            if (touch.phase == LegacyTouchPhase.Began)
+            {
+                AddNitro(nitroPerSwerve);
             }
         }
 
-        // --- Tilt (nghiêng điện thoại) ---
+        // --- Tilt ---
         float tilt = LegacyInput.acceleration.x * tiltSensitivity;
         horizontalInput += Mathf.Clamp(tilt, -1f, 1f);
 
-        // --- Gamepad (Input System) ---
 #if ENABLE_INPUT_SYSTEM
         if (Gamepad.current != null)
         {
@@ -271,7 +134,6 @@ public class PlayerControllerSmooth : MonoBehaviour
             else if (t.phase == LegacyTouchPhase.Ended && isSwiping)
             {
                 Vector2 swipeDelta = t.position - swipeStartPos;
-                // Vuốt lên: y > x
                 if (swipeDelta.magnitude > 50f && swipeDelta.y > Mathf.Abs(swipeDelta.x))
                 {
                     StartCoroutine(DoWheelie());
@@ -298,7 +160,6 @@ public class PlayerControllerSmooth : MonoBehaviour
     {
         if (!isAlive || !isGameStarted) return;
 
-        // Di chuyển thẳng + ngang
         Vector3 moveDirection = transform.forward * speed * Time.fixedDeltaTime;
         moveDirection += transform.right * horizontalInput * speed * Time.fixedDeltaTime;
 
@@ -310,6 +171,51 @@ public class PlayerControllerSmooth : MonoBehaviour
             HandleTiltRotation();
     }
 
+    // ===== Nitro helpers =====
+    private void AddNitro(float amount)
+    {
+        // Nếu đang boost thì không cộng nitro
+        if (isBoosting) return;
+
+        float before = nitro;
+        nitro = Mathf.Clamp(nitro + amount, 0f, nitroMax);
+        UIManager.instance.SetNitroFill01(nitro / nitroMax);
+
+        // Debug
+        Debug.Log($"[NITRO] +{amount} | {before:0}->{nitro:0}/{nitroMax}");
+
+        // Đủ bình thì kích hoạt boost
+        if (nitro >= nitroMax - 0.001f)
+        {
+            nitro = 0f;
+            UIManager.instance.SetNitroFill01(0f);
+
+            
+            GameManager.instance.ActivateSpeedBoost();
+            isBoosting = true; 
+            StartCoroutine(ResetBoostStateAfterDelay());
+        }
+    }
+    private IEnumerator ResetBoostStateAfterDelay()
+    {
+        // Giữ trạng thái boost đúng bằng thời gian hiệu lực của boost
+        float duration = PowerUpDatabase.GetValue("speedboost");
+        yield return new WaitForSeconds(duration);
+        isBoosting = false;
+    }
+
+
+
+    private void HandleNitroDecayAndTrigger()
+    {
+        if (nitro > 0f)
+        {
+            nitro = Mathf.Max(0f, nitro - nitroDecayPerSec * Time.deltaTime);
+            UIManager.instance.SetNitroFill01(nitro / nitroMax);
+        }
+    }
+
+    // ===== Wheelie như trước =====
     IEnumerator DoWheelie()
     {
         if (isWheelie) yield break;
@@ -370,4 +276,3 @@ public class PlayerControllerSmooth : MonoBehaviour
 
     public Rigidbody GetRigidbody() => rb;
 }
-
