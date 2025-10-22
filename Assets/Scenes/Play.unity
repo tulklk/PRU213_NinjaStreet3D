@@ -20202,6 +20202,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   isBoosting: 0
+  wheelieAngle: 25
+  wheelieDuration: 2
+  wheelieSpeed: 3
   gamepadSensitivity: 1
   gamepadDeadzone: 0.15
 --- !u!65 &91299212
@@ -82094,6 +82097,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   isBoosting: 0
+  wheelieAngle: 25
+  wheelieDuration: 2
+  wheelieSpeed: 3
   gamepadSensitivity: 1
   gamepadDeadzone: 0.15
 --- !u!54 &366912889
@@ -102017,6 +102023,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   isBoosting: 0
+  wheelieAngle: 25
+  wheelieDuration: 2
+  wheelieSpeed: 3
   gamepadSensitivity: 1
   gamepadDeadzone: 0.15
 --- !u!65 &449957560
@@ -196700,6 +196709,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   isBoosting: 0
+  wheelieAngle: 25
+  wheelieDuration: 2
+  wheelieSpeed: 3
   gamepadSensitivity: 1
   gamepadDeadzone: 0.15
 --- !u!65 &1026965938
@@ -249373,6 +249385,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   isBoosting: 0
+  wheelieAngle: 25
+  wheelieDuration: 2
+  wheelieSpeed: 3
   gamepadSensitivity: 1
   gamepadDeadzone: 0.15
 --- !u!65 &1339977902
@@ -301012,6 +301027,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   isBoosting: 0
+  wheelieAngle: 25
+  wheelieDuration: 2
+  wheelieSpeed: 3
   gamepadSensitivity: 1
   gamepadDeadzone: 0.15
 --- !u!65 &1593673821
@@ -414389,6 +414407,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   isBoosting: 0
+  wheelieAngle: 25
+  wheelieDuration: 2
+  wheelieSpeed: 3
   gamepadSensitivity: 1
   gamepadDeadzone: 0.15
 --- !u!65 &2065134839

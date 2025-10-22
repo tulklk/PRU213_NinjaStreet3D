@@ -53,7 +53,6 @@ public class UIManager : MonoBehaviour
     public GameObject magnetUI;
     public GameObject shieldUI;
     public GameObject rocketUI;
-    public GameObject wheelieUI;
     public GameObject powerUpShopUI; 
     public GameObject updateSuccessUI;
     public GameObject denyUpdateUI;
@@ -480,28 +479,6 @@ public class UIManager : MonoBehaviour
     public void OnSFXVolumeChanged(float value)
     {
         AudioManager.instance.SetSFXVolume(value);
-    }
-    
-    // =========================
-    // WHEELIE UI FUNCTIONS
-    // =========================
-    
-    public void TurnWheelieUI()
-    {
-        if (wheelieUI != null)
-        {
-            wheelieUI.SetActive(true);
-            Debug.Log("🎮 Wheelie UI ON");
-        }
-    }
-    
-    public void StopWheelieUI()
-    {
-        if (wheelieUI != null)
-        {
-            wheelieUI.SetActive(false);
-            Debug.Log("🎮 Wheelie UI OFF");
-        }
     }
     
 }
