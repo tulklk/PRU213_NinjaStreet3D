@@ -88,33 +88,7 @@ public class PlayerPowerUp : MonoBehaviour
             StartCoroutine(SpeedBoostRoutine());
     }
 
-    //IEnumerator SpeedBoostRoutine()
-    //{
-    //    isSpeedBoosted = true;
-    //    PlayerControllerSmooth.Instance.isBoosting = true;
-
-    //    float originalSpeed = PlayerControllerSmooth.Instance.Speed;
-    //    float boostedSpeed = this.boostedSpeed;
-
-    //    float duration = PowerUpDatabase.GetValue("speedboost");
-
-    //    PlayerControllerSmooth.Instance.Speed = boostedSpeed;
-
-    //    float decelerationDuration = duration * 0.2f;
-    //    yield return new WaitForSeconds(duration - decelerationDuration);
-
-    //    float elapsed = 0f;
-    //    while (elapsed < decelerationDuration)
-    //    {
-    //        PlayerControllerSmooth.Instance.Speed = Mathf.Lerp(boostedSpeed, originalSpeed, elapsed / decelerationDuration);
-    //        elapsed += Time.deltaTime;
-    //        yield return null;
-    //    }
-
-    //    PlayerControllerSmooth.Instance.Speed = originalSpeed;
-    //    PlayerControllerSmooth.Instance.isBoosting = false;
-    //    isSpeedBoosted = false;
-    //}
+    
     IEnumerator SpeedBoostRoutine()
     {
         isSpeedBoosted = true;
@@ -154,7 +128,7 @@ public class PlayerPowerUp : MonoBehaviour
 
 
 
-
+    //Rocket
     public void ActivateRocket()
     {
         if (!isFiringRockets)
