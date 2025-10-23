@@ -8,6 +8,7 @@ public class PlayerEffect : MonoBehaviour
     [Header("Spark Effect")]
     public GameObject sparkEffectLeft;
     public GameObject sparkEffectRight;
+    public GameObject driftSmoke;
 
     private void Awake()
     {

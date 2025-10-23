@@ -84,8 +84,8 @@ public class PlayerControllerSmooth : MonoBehaviour
     private void HandleInput()
     {
         horizontalInput = 0f;
+        //PlayerEffect.Instance.driftSmoke?.SetActive(false);
 
-        
         foreach (LegacyTouch touch in LegacyInput.touches)
         {
             if (IsTouchOverUI(touch.fingerId)) continue;
@@ -94,7 +94,8 @@ public class PlayerControllerSmooth : MonoBehaviour
             if (touch.phase == LegacyTouchPhase.Began || touch.phase == LegacyTouchPhase.Stationary || touch.phase == LegacyTouchPhase.Moved)
             {
                 horizontalInput = (touch.position.x < screenWidth / 2) ? -1f : 1f;
-                
+                PlayerEffect.Instance.driftSmoke?.SetActive(true);
+
             }
 
             // phát hiện chạm vùng rìa để cộng Nitro
@@ -244,12 +245,15 @@ public class PlayerControllerSmooth : MonoBehaviour
 
         isWheelie = false;
     }
-
     public void Die()
     {
+        // Đang boost thì bất tử – bỏ qua mọi lời gọi Die()
+        if (isBoosting) return;
+        if (!isAlive) return;
         isAlive = false;
         GameManager.instance.GameOver();
     }
+
 
     public void SetGameStarted(bool state)
     {
