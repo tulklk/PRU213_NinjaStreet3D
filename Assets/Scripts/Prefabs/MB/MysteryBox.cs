@@ -10,8 +10,6 @@ public class MysteryBox : MonoBehaviour
     public ParticleSystem explosionEffect;
     private GameObject currentItem;
     private bool isOpened = false;
-
-
     void Start()
     {
         GameObject coinDetectorObj = GameObject.Find("CoinDetector");
@@ -38,6 +36,7 @@ public class MysteryBox : MonoBehaviour
             explosionEffect.Play();
 
         Debug.Log("[MysteryBox] ⏳ Chuẩn bị gọi SpinAndChooseItem...");
+        AudioManager.instance.StopVehicleDrivingMusic();
 
         StartCoroutine(SpinAndChooseItem(other.gameObject));
 
@@ -50,7 +49,9 @@ public class MysteryBox : MonoBehaviour
         float delay = 0.1f;
         float delayIncrement = 0.05f;
 
+        
         AudioManager.instance.PlaySpinMusic();
+        
 
         Transform displayPoint = player.transform.Find("MysteryItemPoint");
         if (displayPoint == null)
@@ -74,11 +75,12 @@ public class MysteryBox : MonoBehaviour
         }
 
         AudioManager.instance.StopSpinMusic();
+        AudioManager.instance.PlayVehicleDrivingLoop();
 
         ApplyItemEffect(currentItem.name.Replace("(Clone)", "").Trim(), player);
-
-        yield return new WaitForSeconds(0.5f);
         Destroy(gameObject);
+        yield return new WaitForSeconds(0.5f);
+        
     }
     void ApplyItemEffect(string itemName, GameObject player)
     {
@@ -92,9 +94,9 @@ public class MysteryBox : MonoBehaviour
                 GameManager.instance.AddCoinForMysteryBox();
                 Destroy(currentItem);
                 break;
-            case "Gem":
-                Debug.Log("Tăng 1 đá quý!");
-                break;
+            //case "Gem":
+            //    Debug.Log("Tăng 1 đá quý!");
+            //    break;
             case "Magnet":
                 Debug.Log("Kích hoạt nam châm!");
                 GameManager.instance.ActivateMagnet();

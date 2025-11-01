@@ -838,6 +838,8 @@ public class UIManager : MonoBehaviour
 
     public void ShowGameOverUI(int coins, float distance, float maxDistance)
     {
+        AudioManager.instance.StopVehicleDrivingMusic();
+        AudioManager.instance.StopSpinMusic();
         gameOverUI.SetActive(true);
         playerSceneUI.SetActive(false);
 

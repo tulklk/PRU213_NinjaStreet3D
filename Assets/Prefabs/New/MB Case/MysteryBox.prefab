@@ -4972,6 +4972,7 @@ MonoBehaviour:
   - {fileID: 5847599723944896704, guid: ff524271fb897a24c9208fd6837e0f50, type: 3}
   - {fileID: 1735590124800139144, guid: 5c2f18bf758d02c41b3740183e29ee2d, type: 3}
   - {fileID: 3009214920674118840, guid: f81d639f711192a44a32c90232e36f18, type: 3}
+  - {fileID: 8361873525127347838, guid: ddca8b0e377da184488023e2f7832aee, type: 3}
   displayDuration: 2
   explosionEffect: {fileID: 3866371175926772572, guid: 02b0c5da63b26894b930aafff852f7c0, type: 3}
 --- !u!1 &2769616651009174876

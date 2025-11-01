@@ -229,6 +229,7 @@ public class GameManager : MonoBehaviour
     {
         
         PlayerPowerUp.Instance.ActivateRocket();
+        Debug.Log("[GameManager] Kích hoạt Rocket Power-Up");
         //UIManager.instance.TurnRocketUi();
     }
     

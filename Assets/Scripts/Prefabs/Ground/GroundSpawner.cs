@@ -15,7 +15,7 @@ public class GroundSpawner : MonoBehaviour
     private Dictionary<int, Queue<GameObject>> tilePools = new Dictionary<int, Queue<GameObject>>();
     private Vector3 nextSpawnPoint;
 
-    //Xét sự trùng lặp
+    
     private int stepInCycle = 0;
     private List<int> group1AvailableIndices = new List<int>();
     private List<int> group1UsedInFirst4 = new List<int>();
